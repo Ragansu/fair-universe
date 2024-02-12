@@ -72,7 +72,8 @@ class Scoring:
         # Directory to output computed score into
         self.output_dir = os.path.join(root_dir_name, output_dir_name)
         # reference data (test labels)
-        self.reference_dir = os.path.join(root_dir_name, reference_dir_name)
+        # self.reference_dir = os.path.join(root_dir_name, reference_dir_name)
+        self.reference_dir = os.path.join("/global/cfs/cdirs/m4287/hep/nominal_dataset/Merged_dataset/Full_dataset_21_12_2023","reference_data")
         # submitted/predicted labels
         self.prediction_dir = os.path.join(root_dir_name, predictions_dir_name)
         # score file to write score into
