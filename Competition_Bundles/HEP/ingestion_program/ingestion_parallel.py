@@ -231,9 +231,12 @@ class Ingestion():
         def process_combination(combination, return_dict):
             set_index, test_set_index = combination
             # random tes value (one per test set)
-            tes = np.random.uniform(0.9, 1.1)
-            # create a seed
-            seed = (set_index*100) + test_set_index
+            if USE_SYSTEAMTICS:
+                # random tes value (one per test set)
+                tes = np.random.uniform(0.9, 1.1)
+            else:
+                tes = 1.0            # create a seed
+            seed = (set_index*NUM_PSEUDO_EXPERIMENTS) + test_set_index
             # get mu value of set from test settings
             set_mu = self.test_settings["ground_truth_mus"][set_index]
 
@@ -290,7 +293,7 @@ class Ingestion():
 
         for set_index in set_indices:
             for test_set_index in test_set_indices:
-                seed = (set_index*100) + test_set_index
+                seed = (set_index*NUM_PSEUDO_EXPERIMENTS) + test_set_index
                 if set_index not in self.results_dict:
                     self.results_dict[set_index] = []
                 self.results_dict[set_index].append(return_dict[seed])
