@@ -241,7 +241,7 @@ class Ingestion():
 
             # get bootstrapped dataset from the original test set
             test_set = self.get_bootstraped_dataset(mu=set_mu, tes=tes, seed=seed)
-            print (f"[*] Predicting process")
+            print (f"[*] Predicting process with seed {seed}) 
             predicted_dict = {}
             predicted_dict = self.model.predict(test_set)
             predicted_dict["test_set_index"] = test_set_index
