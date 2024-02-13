@@ -73,7 +73,7 @@ class Scoring:
         self.output_dir = os.path.join(root_dir_name, output_dir_name)
         # reference data (test labels)
         # self.reference_dir = os.path.join(root_dir_name, reference_dir_name)
-        self.reference_dir = os.path.join("/global/cfs/cdirs/m4287/hep/nominal_dataset/Merged_dataset/Full_dataset_21_12_2023","reference_data")
+        self.reference_dir = os.path.join("/global/cfs/cdirs/m4287/hep/challenge_data","reference_data")
         # submitted/predicted labels
         self.prediction_dir = os.path.join(root_dir_name, predictions_dir_name)
         # score file to write score into
@@ -88,6 +88,8 @@ class Scoring:
         if len(sys.argv) > 2:
             self.prediction_dir = sys.argv[2]
 
+        print(f"[*] -- OutPut Directory : {self.output_dir}")
+        print(f"[*] -- Prediction Directory : {self.prediction_dir}")
         # Add to path
         sys.path.append(self.reference_dir)
         sys.path.append(self.output_dir)
