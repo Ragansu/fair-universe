@@ -76,10 +76,6 @@ class Scoring:
         self.reference_dir = os.path.join("/global/cfs/cdirs/m4287/hep/challenge_data","reference_data")
         # submitted/predicted labels
         self.prediction_dir = os.path.join(root_dir_name, predictions_dir_name)
-        # score file to write score into
-        self.score_file = os.path.join(output_dir_name, score_file_name)
-        # html file to write score and figures into
-        self.html_file = os.path.join(output_dir_name, html_file_name)
 
         # In case predictions dir and output dir are provided as args
         if len(sys.argv) > 1:
@@ -90,6 +86,12 @@ class Scoring:
 
         print(f"[*] -- OutPut Directory : {self.output_dir}")
         print(f"[*] -- Prediction Directory : {self.prediction_dir}")
+
+        # score file to write score into
+        self.score_file = os.path.join(self.output_dir, score_file_name)
+        # html file to write score and figures into
+        self.html_file = os.path.join(self.output_dir, html_file_name)
+
         # Add to path
         sys.path.append(self.reference_dir)
         sys.path.append(self.output_dir)

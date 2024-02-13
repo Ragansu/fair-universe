@@ -236,6 +236,7 @@ class Ingestion():
                 tes = np.random.uniform(0.9, 1.1)
             else:
                 tes = 1.0            # create a seed
+                
             seed = (set_index*NUM_PSEUDO_EXPERIMENTS) + test_set_index
             # get mu value of set from test settings
             set_mu = self.test_settings["ground_truth_mus"][set_index]
