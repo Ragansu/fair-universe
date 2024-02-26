@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore")
 # True when running on Codabench
 # False when running locally
 CODABENCH = False
-NUM_SETS = 1  # Total = 10
+NUM_SETS = 10  # Total = 10
 NUM_PSEUDO_EXPERIMENTS = 100  # Total = 100
 USE_SYSTEAMTICS = True
 
@@ -80,7 +80,7 @@ class Ingestion():
 
         # Input data directory to read training and test data from
         # self.input_dir = os.path.join(root_dir_name, input_data_dir_name)
-        self.input_dir = os.path.join("/global/cfs/cdirs/m4287/hep/challenge_data","input_data")
+        self.input_dir = os.path.join("/home/chakkappai/Work/Fair-Universe/Full_dataset_21_12_2023","input_data")
         # Output data directory to write predictions to
         self.output_dir = os.path.join(root_dir_name, output_dir_name)
         # Program directory
@@ -244,12 +244,13 @@ class Ingestion():
                 self.results_dict[set_index] = []
             self.results_dict[set_index].append(predicted_dict)
 
+            del test_set
+
     def save_result(self):
         print("[*] Saving ingestion result")
 
         # loop over sets
-        # for i in range(0, 10):
-        for i in range(0, 1):
+        for i in range(0, NUM_SETS):
             set_result = self.results_dict[i]
             set_result.sort(key=lambda x: x['test_set_index'])
             mu_hats, delta_mu_hats, p16, p84 = [], [], [], []

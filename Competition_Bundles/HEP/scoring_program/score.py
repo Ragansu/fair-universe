@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import sys
 import io
 import base64
+import mplhep as hep
+
+hep.set_style("ATLAS")
 
 # ------------------------------------------
 # Settings
@@ -16,7 +19,7 @@ import base64
 # True when running on Codabench
 # False when running locally
 CODABENCH = False
-NUM_SETS = 1  # Total = 10
+NUM_SETS = 4  # Total = 10
 
 
 class Scoring:
@@ -73,7 +76,7 @@ class Scoring:
         self.output_dir = os.path.join(root_dir_name, output_dir_name)
         # reference data (test labels)
         # self.reference_dir = os.path.join(root_dir_name, reference_dir_name)
-        self.reference_dir = os.path.join("/global/cfs/cdirs/m4287/hep/challenge_data","reference_data")
+        self.reference_dir = os.path.join("/home/chakkappai/Work/Fair-Universe/Full_dataset_21_12_2023","reference_data")
         # submitted/predicted labels
         self.prediction_dir = os.path.join(root_dir_name, predictions_dir_name)
 
@@ -83,6 +86,12 @@ class Scoring:
 
         if len(sys.argv) > 2:
             self.prediction_dir = sys.argv[2]
+
+        if len(sys.argv) > 3:
+            DEBUG = sys.argv[3]
+
+        if DEBUG == '--debug':
+            self.DEBUG = True
 
         print(f"[*] -- OutPut Directory : {self.output_dir}")
         print(f"[*] -- Prediction Directory : {self.prediction_dir}")
@@ -122,6 +131,8 @@ class Scoring:
         # loop over ingestion results
         rmses, maes = [], []
         all_p16s, all_p84s, all_mus = [], [], []
+        all_delta_mu_hats = []
+        all_mu_hats = []
         for i, (ingestion_result, mu) in enumerate(zip(self.ingestion_results, self.test_settings["ground_truth_mus"])):
 
             mu_hats = ingestion_result["mu_hats"]
@@ -132,6 +143,8 @@ class Scoring:
             all_mus.extend(np.repeat(mu, len(p16s)))
             all_p16s.extend(p16s)
             all_p84s.extend(p84s)
+            all_delta_mu_hats.extend(delta_mu_hats)
+            all_mu_hats.extend(mu_hats)
 
             set_rmses, set_maes = [], []
             for mu_hat, delta_mu_hat in zip(mu_hats, delta_mu_hats):
@@ -151,13 +164,17 @@ class Scoring:
             self._print(f"Coverage: {set_coverage}")
             self._print(f"Quantiles Score: {set_quantiles_score}")
 
-            self.save_figure(mu=np.mean(mu_hats), p16s=p16s, p84s=p84s, set=i)
+            self.save_figure(mu=mu,mu_hat=np.mean(mu_hats), p16s=p16s, p84s=p84s, set=i,DEBUG=self.DEBUG)
+            
 
             # Save set scores in lists
             rmses.append(set_rmse)
             maes.append(set_mae)
 
         overall_interval, overall_coverage, overall_quantiles_score = self.Quantiles_Score(np.array(all_mus), np.array(all_p16s), np.array(all_p84s))
+        if self.DEBUG:
+            self.plot_mu_vs_mu_hat(mu=np.array(all_mus), mu_hat=np.array(all_mu_hats), 
+                                delta_mu_hat=np.array(all_delta_mu_hats))
 
         self.scores_dict = {
             "rmse": np.mean(rmses),
@@ -250,17 +267,41 @@ class Scoring:
         print(content)
         self.write_html(content + "<br>")
 
-    def save_figure(self, mu, p16s, p84s, set=0):
+    def save_figure(self, mu,mu_hat, p16s, p84s, set=0,DEBUG=False):
         fig = plt.figure(figsize=(5, 5))
         # plot horizontal lines from p16 to p84
         for i, (p16, p84) in enumerate(zip(p16s, p84s)):
             plt.hlines(y=i, xmin=p16, xmax=p84, colors='b')
-        plt.vlines(x=mu, ymin=0, ymax=len(p16s), colors='r', linestyles='dashed', label="average $\mu$")
-        plt.xlabel('mu')
-        plt.ylabel('psuedo-experiments')
-        plt.title(f'mu distribution - Set {set}')
-        plt.legend()
 
+
+        if DEBUG:
+            plt.vlines(x=mu, ymin=0, ymax=len(p16s), colors='green', linestyles='dashed', label="True $\mu$")
+
+        plt.vlines(x=mu_hat, ymin=0, ymax=len(p16s), colors='r', linestyles='dashed', label="average $\mu$")
+        plt.xlabel('$\mu$')
+        plt.ylabel('psuedo-experiments')
+        plt.title(f'$\mu$ distribution - Set {set}')
+        plt.legend()
+        hep.atlas.text("Internal", loc=1)
+
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        fig_b64 = base64.b64encode(buf.getvalue()).decode('ascii')
+
+        self.write_html(f"<img src='data:image/png;base64,{fig_b64}'><br>")
+
+
+
+    def plot_mu_vs_mu_hat(self, mu, mu_hat, delta_mu_hat):
+        fig = plt.figure(figsize=(5, 5))
+        plt.errorbar(mu, mu_hat, yerr=delta_mu_hat, fmt='o', label="Estimated $\mu$",markersize=2,color='b')
+        plt.plot([0, 4], [0, 4], 'r--')
+        plt.xlabel('True $\mu$')
+        plt.ylabel('Estimated $\mu$')
+        plt.title(f'$\mu$ vs $\hat{{\mu}}$')
+        plt.legend(loc = 'upper right')
+        hep.atlas.text("Internal", loc=1)
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
         buf.seek(0)

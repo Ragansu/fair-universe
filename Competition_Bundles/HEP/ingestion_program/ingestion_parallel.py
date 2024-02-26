@@ -24,7 +24,7 @@ CODABENCH = False
 NUM_SETS = 1  # Total = 10
 NUM_PSEUDO_EXPERIMENTS = 100  # Total = 100
 USE_SYSTEAMTICS = True
-NUM_PROCESS = 10
+NUM_PROCESS = 3
 
 
 # ------------------------------------------
@@ -82,7 +82,7 @@ class Ingestion():
 
         # Input data directory to read training and test data from
         # self.input_dir = os.path.join(root_dir_name, input_data_dir_name)
-        self.input_dir = os.path.join("/global/cfs/cdirs/m4287/hep/challenge_data","input_data")
+        self.input_dir = os.path.join("/home/chakkappai/Work/Fair-Universe/Full_dataset_21_12_2023","input_data")
         # Output data directory to write predictions to
         self.output_dir = os.path.join(root_dir_name, output_dir_name)
         # Program directory
